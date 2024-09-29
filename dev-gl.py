@@ -1,121 +1,126 @@
 #!/usr/bin/env python3
-"""
-dev-gl.py: A script to manage OpenGL development environment for Linux and macOS.
-Allows downloading dependencies, building, and running OpenGL applications.
-"""
 
 import os
-import sys
 import subprocess
+import sys
 
 
 class DevGL:
-    """
-    A class to handle OpenGL environment setup and program management.
-    """
-
     def __init__(self):
-        """
-        Initialize the class with platform-specific settings.
-        """
-        self.platform = sys.platform
-        self.supported_platforms = ['linux', 'darwin']
+        self.projects = {
+            "app": "app/src",
+            "advanced_app": "advanced_app/src",
+            "colorful_triangle": "colorful_triangle/src",
+        }
 
-    def download_deps(self):
-        """
-        Install OpenGL dependencies based on the platform.
-        """
-        if self.platform not in self.supported_platforms:
-            print(f"Unsupported platform: {self.platform}")
+    # Function to print help/usage information
+    def print_help(self):
+        print("Usage: ./dev-gl.py [command] [options]\n")
+        print("Commands:")
+        print("  download dependencies   Install necessary dependencies.")
+        print("  run [project_name]      Build and run an OpenGL project (e.g., app).\n")
+        print("Available Projects:")
+        for project in self.projects:
+            print(f"  {project}")
+        print("\nExamples:")
+        print("  ./dev-gl.py download dependencies")
+        print("  ./dev-gl.py run app")
+
+    # Function to download dependencies based on the OS
+    def download_dependencies(self):
+        print("Installing dependencies...")
+        result = subprocess.run(["sudo", "apt-get", "install", "-y",
+                                 "build-essential", "libgl1-mesa-dev", "libglew-dev",
+                                 "libglfw3", "libglfw3-dev", "mesa-utils", "x11-apps",
+                                 "libfreetype6-dev", "pciutils", "libbox2d-dev", 
+                                 "meson", "ninja-build", "pkg-config"])
+        if result.returncode != 0:
+            print("Error occurred during dependencies installation.")
+            sys.exit(1)
+        print("Dependencies installed successfully.")
+
+    # Function to set up the Meson build directory for a specific project
+    def setup_meson(self, project_name):
+        project_dir = self.projects.get(project_name)
+        if not project_dir:
+            print(f"Project {project_name} does not exist.")
             sys.exit(1)
 
-        if self.platform.startswith('linux'):
-            print("Installing OpenGL dependencies for Linux...")
-            os.system('sudo apt update && sudo apt install -y build-essential libgl1-mesa-dev libglew-dev libglfw3 libglfw3-dev mesa-utils x11-apps libfreetype6-dev pciutils libbox2d-dev')
-        elif self.platform == 'darwin':
-            print("Installing OpenGL dependencies for macOS...")
-            os.system('brew install glfw glew glm')
-
-    def build_app(self, source_file):
-        """
-        Build the OpenGL program using GCC.
-
-        Args:
-            source_file (str): The path to the source file (C program) to compile.
-        """
-        if not source_file.endswith('.c'):
-            print(f"Error: {source_file} is not a C file.")
-            sys.exit(1)
-
-        output_file = source_file.replace('.c', '')
-
-        if self.platform == 'linux' or self.platform == 'linux2':
-            command = f"gcc {source_file} -lGL -lglfw -lGLEW -lbox2d -lm -o {output_file}"
-        elif self.platform == 'darwin':
-            command = f"gcc {source_file} -I/usr/local/include -L/usr/local/lib -lGL -lglfw -lGLEW -o {output_file}"
-        else:
-            print(f"Unsupported platform: {self.platform}")
-            sys.exit(1)
-
-        print(f"Building {source_file}...")
-        try:
-            subprocess.run(command, shell=True, check=True)
-            print(f"Built {output_file}")
-        except subprocess.CalledProcessError as error:
-            print(f"Error occurred while building: {error}")
-            sys.exit(1)
-
-    def run_app(self, source_file):
-        """
-        Run the compiled OpenGL program.
-
-        Args:
-            source_file (str): The path to the source file (C program) to run.
-        """
-        output_file = source_file.replace('.c', '')
-        if os.path.exists(output_file):
-            print(f"Running {output_file}...")
-            try:
-                subprocess.run(f"./{output_file}", shell=True)
-            except subprocess.CalledProcessError as error:
-                print(f"Error occurred while running: {error}")
+        build_dir = os.path.join(project_dir, "../build")
+        if not os.path.exists(build_dir):
+            print(f"Setting up Meson build directory for {project_name}...")
+            result = subprocess.run(['meson', 'setup', build_dir, project_dir])
+            if result.returncode != 0:
+                print(f"Failed to set up Meson for {project_name}.")
                 sys.exit(1)
+            print(f"Meson build directory created for {project_name}.")
         else:
-            print(f"Error: {output_file} not found. Build the app first.")
+            print(f"Meson build directory already exists for {project_name}.")
+
+    # Function to build the project using Meson
+    def build_project(self, project_name):
+        project_dir = self.projects.get(project_name)
+        if not project_dir:
+            print(f"Project {project_name} does not exist.")
             sys.exit(1)
 
-    @staticmethod
-    def print_usage():
-        """
-        Print the usage of the script.
-        """
-        print("Usage:")
-        print("  ./dev-gl.py download deps  - Download OpenGL dependencies")
-        print("  ./dev-gl.py build <file.c> - Build an OpenGL program")
-        print("  ./dev-gl.py run <file.c>   - Run an OpenGL program")
+        build_dir = os.path.join(project_dir, "../build")
+        print(f"Building {project_name} using Meson...")
+        result = subprocess.run(['meson', 'compile', '-C', build_dir])
+        if result.returncode != 0:
+            print(f"Error occurred while building {project_name}.")
+            sys.exit(1)
+        print(f"Built {project_name} successfully.")
+
+    # Function to run the built project
+    def run_project(self, project_name):
+        project_dir = self.projects.get(project_name)
+        if not project_dir:
+            print(f"Project {project_name} does not exist.")
+            sys.exit(1)
+
+        executable_path = os.path.join(project_dir, "../build", project_name)
+        if os.path.exists(executable_path):
+            print(f"Running {project_name}...")
+            subprocess.run([executable_path])
+        else:
+            print(f"Executable for {project_name} not found. Please build it first.")
+            sys.exit(1)
+
+    # Function to handle command-line arguments
+    def handle_command(self, args):
+        if len(args) < 2:
+            self.print_help()
+            sys.exit(1)
+
+        command = args[1]
+
+        if command == "--help":
+            self.print_help()
+        elif command == "download":
+            if len(args) == 3 and args[2] == "dependencies":
+                self.download_dependencies()
+            else:
+                print("Invalid command. Use './dev-gl.py --help' to see usage.")
+                sys.exit(1)
+        elif command == "run":
+            if len(args) != 3:
+                print("Please provide a project to run (e.g., app).")
+                sys.exit(1)
+            project_name = args[2]
+            self.setup_meson(project_name)
+            self.build_project(project_name)
+            self.run_project(project_name)
+        else:
+            print(f"Unknown command: {command}")
+            print("Use './dev-gl.py --help' to see usage.")
+            sys.exit(1)
 
 
+# Main function
 def main():
-    """
-    Main function to handle command-line arguments and execute the corresponding methods.
-    """
-    if len(sys.argv) < 3:
-        DevGL.print_usage()
-        sys.exit(1)
-
-    command = sys.argv[1]
     dev_gl = DevGL()
-
-    if command == 'download' and sys.argv[2] == 'deps':
-        dev_gl.download_deps()
-    elif command == 'build':
-        dev_gl.build_app(sys.argv[2])
-    elif command == 'run':
-        dev_gl.run_app(sys.argv[2])
-    else:
-        print("Invalid command or arguments.")
-        DevGL.print_usage()
-        sys.exit(1)
+    dev_gl.handle_command(sys.argv)
 
 
 if __name__ == "__main__":

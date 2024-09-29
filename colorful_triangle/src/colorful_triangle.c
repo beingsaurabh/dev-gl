@@ -52,7 +52,7 @@ int main() {
     }
 
     // Create a GLFW window
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Keyboard Interaction", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Keyboard Interaction, Press R, G, B Use Left, Right, Up, Down arrow", NULL, NULL);
     if (!window) {
         printf("Failed to create GLFW window\n");
         glfwTerminate();

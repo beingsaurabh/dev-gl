@@ -11,7 +11,8 @@ class DevGL:
             "app": "app/src",
             "advanced_app": "advanced_app/src",
             "colorful_triangle": "colorful_triangle/src",
-        }
+            "evaluator_test": "evaluator_test/src",
+            }
 
     # Function to print help/usage information
     def print_help(self):
@@ -29,11 +30,15 @@ class DevGL:
     # Function to download dependencies based on the OS
     def download_dependencies(self):
         print("Installing dependencies...")
+        os.system('sudo apt update')
         result = subprocess.run(["sudo", "apt-get", "install", "-y",
                                  "build-essential", "libgl1-mesa-dev", "libglew-dev",
                                  "libglfw3", "libglfw3-dev", "mesa-utils", "x11-apps",
                                  "libfreetype6-dev", "pciutils", "libbox2d-dev", 
-                                 "meson", "ninja-build", "pkg-config"])
+                                 "meson", "ninja-build", "pkg-config", "libpci-dev", "freeglut3-dev"])
+            
+
+        
         if result.returncode != 0:
             print("Error occurred during dependencies installation.")
             sys.exit(1)
@@ -98,7 +103,7 @@ class DevGL:
         if command == "--help":
             self.print_help()
         elif command == "download":
-            if len(args) == 3 and args[2] == "dependencies":
+            if len(args) == 3 and args[2] == "deps":
                 self.download_dependencies()
             else:
                 print("Invalid command. Use './dev-gl.py --help' to see usage.")

@@ -2,7 +2,7 @@
 ## Author: Saurabh Tripathi (saurabhtripathi1102000@gmail.com)
 
 ## Introduction
-`dev-gl` is a repository designed to help developers set up an OpenGL development environment and run OpenGL programs in Linux. This repo provides plug n play privilage for OpenGL apps and a collection of OpenGL example programs for learning and experimentation.
+`dev-gl` is a repository designed to help developers set up an OpenGL development environment and run OpenGL programs in Linux (debian based, x86 arch). This repo provides plug n play privilage for OpenGL apps and a collection of OpenGL example programs for learning and experimentation.
 
 ## How to add your own project:
 * mkdir <my_app> && cd <my_app>

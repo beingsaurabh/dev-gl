@@ -14,6 +14,7 @@
 ## How to use:
 * ./dev-gl.py download deps (Feel free to add more deps)
 * Add your project info in `./dev-gl.py`
+
   For eg: self.projects = {
             "app": "app/src",
             "advanced_app": "advanced_app/src",
@@ -23,7 +24,7 @@
 * ./dev-gl.py run <app_name>
 
 
-In case your are using WSL1 and install some X server app:
+In case your are using WSL1, then install some X server app:
 For eg: 
 `VcXsrv`: One of the most common X servers for WSL.
 Download and install VcXsrv and

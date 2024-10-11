@@ -14,6 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: download deps
-      run: ./dev-gl download deps
+      run: ./dev-gl.py download deps
     - name: build app (app)
-      run: ./dev-gl run app
+      run: ./dev-gl.py run app

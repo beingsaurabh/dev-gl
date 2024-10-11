@@ -17,3 +17,9 @@ jobs:
       run: ./dev-gl.py download deps
     - name: build app (app)
       run: ./dev-gl.py run app
+    - name: build app (app)
+      run: ./dev-gl.py run advanced_app
+    - name: build app (app)
+      run: ./dev-gl.py run colorful_triangle
+    - name: build app (app)
+      run: ./dev-gl.py run evaluator_test

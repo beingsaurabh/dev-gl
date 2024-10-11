@@ -1,0 +1,19 @@
+name: dev-gl CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: download deps
+      run: ./dev-gl download deps
+    - name: build app (app)
+      run: ./dev-gl run app

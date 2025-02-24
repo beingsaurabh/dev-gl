@@ -6,7 +6,7 @@
 
 ## How to add your own project:
 * mkdir <my_app> && cd <my_app>
-* mkdir <src>
+* mkdir src
 * touch <my_app.c> && touch meson.build
 * Write your app and modify meson.build with all required deps
 
